@@ -755,6 +755,46 @@ body {
 }
 .stage0-nav .btn { flex: 1; min-width: 110px; }
 .stage0-nav .btn.big { padding: 12px 14px; font-size: 1rem; }
+
+/* === Hero scene === */
+.hero-scene {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 -12px 8px;
+  max-width: calc(100% + 24px);
+  image-rendering: pixelated;
+  shape-rendering: crispEdges;
+}
+.hero-scene + .menu-title { margin-top: 4px; }
+.hero-scene text { font-family: 'Galmuri11', monospace; }
+
+/* === Block icons === */
+.block-icon {
+  width: 36px;
+  height: 36px;
+  image-rendering: pixelated;
+  shape-rendering: crispEdges;
+  filter: drop-shadow(2px 2px 0 rgba(0,0,0,0.4));
+}
+.stage-icon .block-icon { width: 38px; height: 38px; }
+.stage-icon {
+  background: var(--mc-slot-dark);
+  /* re-style as Minecraft slot */
+}
+
+/* dirt floor pattern at the very bottom of body */
+body::before {
+  content: '';
+  position: fixed;
+  inset: auto 0 0 0;
+  height: 50px;
+  background-image:
+    repeating-linear-gradient(0deg, transparent 0, transparent 6px, rgba(0,0,0,0.05) 6px, rgba(0,0,0,0.05) 7px),
+    repeating-linear-gradient(90deg, transparent 0, transparent 12px, rgba(0,0,0,0.08) 12px, rgba(0,0,0,0.08) 13px);
+  pointer-events: none;
+  z-index: -1;
+}
 </style>
 </head>
 <body>
@@ -986,19 +1026,288 @@ function render() {
 }
 
 // ============ MENU ============
+// ============ PIXEL ART BLOCK ICONS (16×16 SVG) ============
+const MC_BLOCKS = {
+  noteBlock: `<svg class="block-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect width="16" height="16" fill="#a0744e"/>
+    <rect y="3" width="16" height="1" fill="#7c5e3a"/>
+    <rect y="9" width="16" height="1" fill="#7c5e3a"/>
+    <rect y="13" width="16" height="1" fill="#7c5e3a"/>
+    <rect x="3" y="6" width="1" height="2" fill="#7c5e3a"/>
+    <rect x="10" y="11" width="1" height="2" fill="#7c5e3a"/>
+    <rect x="6" y="4" width="2" height="6" fill="#2c1810"/>
+    <rect x="8" y="3" width="2" height="2" fill="#2c1810"/>
+    <rect x="4" y="9" width="3" height="3" fill="#2c1810"/>
+  </svg>`,
+  apple: `<svg class="block-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect x="8" y="2" width="1" height="2" fill="#5a4528"/>
+    <rect x="9" y="2" width="2" height="2" fill="#5d8e3a"/>
+    <rect x="4" y="4" width="8" height="2" fill="#d32f2f"/>
+    <rect x="3" y="6" width="10" height="6" fill="#d32f2f"/>
+    <rect x="4" y="12" width="8" height="2" fill="#d32f2f"/>
+    <rect x="5" y="6" width="2" height="2" fill="#ef5350"/>
+    <rect x="5" y="8" width="1" height="2" fill="#ef5350"/>
+    <rect x="3" y="6" width="1" height="2" fill="#9a1f1f"/>
+    <rect x="12" y="6" width="1" height="2" fill="#9a1f1f"/>
+  </svg>`,
+  redstone: `<svg class="block-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect width="16" height="16" fill="#9a1f1f"/>
+    <rect x="2" y="2" width="3" height="3" fill="#ff5252"/>
+    <rect x="9" y="3" width="3" height="2" fill="#ff5252"/>
+    <rect x="11" y="7" width="3" height="3" fill="#ff5252"/>
+    <rect x="4" y="9" width="3" height="3" fill="#ff5252"/>
+    <rect x="2" y="13" width="2" height="2" fill="#ff5252"/>
+    <rect x="9" y="12" width="3" height="3" fill="#ff5252"/>
+    <rect x="3" y="3" width="1" height="1" fill="#ff8a80"/>
+    <rect x="10" y="3" width="1" height="1" fill="#ff8a80"/>
+    <rect x="12" y="8" width="1" height="1" fill="#ff8a80"/>
+    <rect x="5" y="10" width="1" height="1" fill="#ff8a80"/>
+    <rect x="10" y="13" width="1" height="1" fill="#ff8a80"/>
+  </svg>`,
+  slime: `<svg class="block-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect width="16" height="16" fill="#a4d65e"/>
+    <rect x="2" y="2" width="12" height="12" fill="#74b639"/>
+    <rect x="1" y="1" width="1" height="1" fill="#c2e891"/>
+    <rect x="14" y="1" width="1" height="1" fill="#c2e891"/>
+    <rect x="1" y="14" width="1" height="1" fill="#c2e891"/>
+    <rect x="14" y="14" width="1" height="1" fill="#c2e891"/>
+    <rect x="4" y="6" width="2" height="2" fill="#2c1810"/>
+    <rect x="10" y="6" width="2" height="2" fill="#2c1810"/>
+    <rect x="4" y="6" width="1" height="1" fill="white"/>
+    <rect x="10" y="6" width="1" height="1" fill="white"/>
+    <rect x="6" y="10" width="4" height="1" fill="#2c1810"/>
+    <rect x="5" y="9" width="1" height="1" fill="#2c1810"/>
+    <rect x="10" y="9" width="1" height="1" fill="#2c1810"/>
+  </svg>`,
+  book: `<svg class="block-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect x="2" y="2" width="12" height="12" fill="#a0744e"/>
+    <rect x="2" y="2" width="12" height="2" fill="#7c5e3a"/>
+    <rect x="2" y="12" width="12" height="2" fill="#7c5e3a"/>
+    <rect x="2" y="2" width="1" height="12" fill="#7c5e3a"/>
+    <rect x="13" y="2" width="1" height="12" fill="#7c5e3a"/>
+    <rect x="11" y="2" width="2" height="5" fill="#d32f2f"/>
+    <rect x="11" y="7" width="1" height="1" fill="#d32f2f"/>
+    <rect x="12" y="7" width="1" height="1" fill="#d32f2f"/>
+    <rect x="4" y="5" width="6" height="1" fill="#fce8c0"/>
+    <rect x="4" y="7" width="5" height="1" fill="#fce8c0"/>
+    <rect x="4" y="9" width="6" height="1" fill="#fce8c0"/>
+    <rect x="4" y="11" width="4" height="1" fill="#fce8c0"/>
+  </svg>`,
+  dice: `<svg class="block-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect x="2" y="2" width="12" height="12" fill="#7e57c2"/>
+    <rect x="2" y="2" width="12" height="2" fill="#b39ddb"/>
+    <rect x="2" y="2" width="2" height="12" fill="#b39ddb"/>
+    <rect x="2" y="12" width="12" height="2" fill="#4527a0"/>
+    <rect x="12" y="2" width="2" height="12" fill="#4527a0"/>
+    <rect x="5" y="5" width="2" height="2" fill="#ede7f6"/>
+    <rect x="9" y="9" width="2" height="2" fill="#ede7f6"/>
+    <rect x="5" y="9" width="2" height="2" fill="#ede7f6"/>
+    <rect x="9" y="5" width="2" height="2" fill="#ede7f6"/>
+    <rect x="5" y="5" width="1" height="1" fill="white"/>
+    <rect x="9" y="5" width="1" height="1" fill="white"/>
+    <rect x="5" y="9" width="1" height="1" fill="white"/>
+    <rect x="9" y="9" width="1" height="1" fill="white"/>
+  </svg>`,
+  chest: `<svg class="block-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect x="1" y="3" width="14" height="11" fill="#a0744e"/>
+    <rect x="1" y="3" width="14" height="2" fill="#7c5e3a"/>
+    <rect x="1" y="13" width="14" height="1" fill="#5a4528"/>
+    <rect x="1" y="3" width="1" height="11" fill="#7c5e3a"/>
+    <rect x="14" y="3" width="1" height="11" fill="#5a4528"/>
+    <rect x="7" y="6" width="2" height="3" fill="#fcfc54"/>
+    <rect x="7" y="6" width="2" height="1" fill="#b8841e"/>
+    <rect x="7" y="8" width="2" height="1" fill="#b8841e"/>
+  </svg>`,
+  gacha: `<svg class="block-icon" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
+    <rect x="2" y="2" width="12" height="12" fill="#ec407a"/>
+    <rect x="2" y="2" width="12" height="2" fill="#f48fb1"/>
+    <rect x="2" y="2" width="2" height="12" fill="#f48fb1"/>
+    <rect x="2" y="12" width="12" height="2" fill="#ad1457"/>
+    <rect x="12" y="2" width="2" height="12" fill="#ad1457"/>
+    <rect x="6" y="6" width="4" height="1" fill="#fcfc54"/>
+    <rect x="5" y="7" width="6" height="2" fill="#fcfc54"/>
+    <rect x="6" y="9" width="4" height="1" fill="#fcfc54"/>
+    <rect x="7" y="10" width="2" height="2" fill="#fcfc54"/>
+  </svg>`,
+};
+
+// ============ HERO ILLUSTRATION ============
+const HERO_SVG = `<svg class="hero-scene" viewBox="0 0 720 200" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" shape-rendering="crispEdges">
+  <defs>
+    <linearGradient id="herosky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5cb6ff"/>
+      <stop offset="1" stop-color="#b8e0ff"/>
+    </linearGradient>
+  </defs>
+  <rect width="720" height="200" fill="url(#herosky)"/>
+  <!-- clouds (block style) -->
+  <g fill="white">
+    <rect x="60" y="25" width="90" height="10"/>
+    <rect x="50" y="35" width="110" height="10"/>
+    <rect x="70" y="45" width="70" height="10"/>
+    <rect x="420" y="18" width="80" height="10"/>
+    <rect x="410" y="28" width="100" height="10"/>
+    <rect x="430" y="38" width="60" height="10"/>
+    <rect x="240" y="65" width="60" height="8"/>
+    <rect x="250" y="73" width="40" height="8"/>
+  </g>
+  <!-- sun (Minecraft-style soft square) -->
+  <g transform="translate(660 20)">
+    <rect x="2" y="0" width="20" height="28" fill="#fff59d"/>
+    <rect x="0" y="2" width="24" height="24" fill="#fff59d"/>
+    <rect x="4" y="2" width="16" height="24" fill="#ffeb3b"/>
+    <rect x="2" y="4" width="20" height="20" fill="#ffeb3b"/>
+    <rect x="6" y="6" width="12" height="16" fill="#ffd54f"/>
+  </g>
+  <!-- mountain silhouette -->
+  <g fill="#4a7d35">
+    <rect x="540" y="80" width="40" height="35"/>
+    <rect x="530" y="90" width="60" height="25"/>
+    <rect x="520" y="100" width="80" height="15"/>
+  </g>
+  <g fill="#7cb342">
+    <rect x="555" y="85" width="10" height="5"/>
+    <rect x="545" y="95" width="6" height="6"/>
+    <rect x="575" y="100" width="8" height="6"/>
+  </g>
+  <!-- ground dirt -->
+  <rect x="0" y="125" width="720" height="75" fill="#7c5e3a"/>
+  <!-- grass top edge -->
+  <rect x="0" y="115" width="720" height="14" fill="#5d8e3a"/>
+  <rect x="0" y="115" width="720" height="3" fill="#7cb342"/>
+  <!-- grass blades -->
+  <g fill="#7cb342">
+    <rect x="20" y="113" width="2" height="2"/>
+    <rect x="68" y="111" width="2" height="4"/>
+    <rect x="180" y="113" width="2" height="2"/>
+    <rect x="240" y="112" width="2" height="3"/>
+    <rect x="358" y="111" width="2" height="4"/>
+    <rect x="430" y="113" width="2" height="2"/>
+    <rect x="528" y="112" width="2" height="3"/>
+    <rect x="640" y="111" width="2" height="4"/>
+  </g>
+  <!-- dirt texture -->
+  <g fill="#5a4528">
+    <rect x="40" y="142" width="4" height="4"/>
+    <rect x="120" y="158" width="4" height="4"/>
+    <rect x="250" y="170" width="4" height="4"/>
+    <rect x="380" y="148" width="4" height="4"/>
+    <rect x="500" y="162" width="4" height="4"/>
+    <rect x="600" y="180" width="4" height="4"/>
+    <rect x="680" y="155" width="4" height="4"/>
+    <rect x="160" y="185" width="4" height="4"/>
+    <rect x="300" y="155" width="4" height="4"/>
+  </g>
+  <g fill="#a0744e">
+    <rect x="80" y="160" width="3" height="3"/>
+    <rect x="200" y="175" width="3" height="3"/>
+    <rect x="330" y="180" width="3" height="3"/>
+    <rect x="450" y="145" width="3" height="3"/>
+    <rect x="580" y="170" width="3" height="3"/>
+  </g>
+  <!-- stone block decoration -->
+  <g>
+    <rect x="20" y="155" width="50" height="45" fill="#7d7d7d"/>
+    <rect x="20" y="155" width="50" height="3" fill="#9d9d9d"/>
+    <rect x="20" y="155" width="3" height="45" fill="#9d9d9d"/>
+    <rect x="67" y="158" width="3" height="42" fill="#5d5d5d"/>
+    <rect x="23" y="197" width="44" height="3" fill="#5d5d5d"/>
+    <rect x="28" y="165" width="6" height="4" fill="#5d5d5d"/>
+    <rect x="48" y="178" width="6" height="4" fill="#5d5d5d"/>
+    <rect x="32" y="185" width="4" height="4" fill="#9d9d9d"/>
+    <rect x="55" y="168" width="4" height="4" fill="#9d9d9d"/>
+  </g>
+  <!-- Cherry blossom tree (left) -->
+  <g>
+    <!-- trunk -->
+    <rect x="180" y="80" width="14" height="35" fill="#5a4528"/>
+    <rect x="180" y="80" width="3" height="35" fill="#3d2f1c"/>
+    <rect x="191" y="80" width="3" height="35" fill="#3d2f1c"/>
+    <rect x="180" y="88" width="14" height="2" fill="#3d2f1c"/>
+    <rect x="180" y="100" width="14" height="2" fill="#3d2f1c"/>
+    <!-- pink leaves -->
+    <rect x="160" y="50" width="54" height="35" fill="#f48fb1"/>
+    <rect x="154" y="40" width="66" height="10" fill="#f48fb1"/>
+    <rect x="166" y="30" width="42" height="10" fill="#f48fb1"/>
+    <rect x="170" y="55" width="6" height="6" fill="#ec407a"/>
+    <rect x="185" y="65" width="6" height="6" fill="#ec407a"/>
+    <rect x="200" y="55" width="6" height="6" fill="#ec407a"/>
+    <rect x="195" y="42" width="4" height="4" fill="#ec407a"/>
+    <rect x="175" y="35" width="4" height="4" fill="#ec407a"/>
+    <rect x="158" y="50" width="3" height="3" fill="#fce4ec"/>
+    <rect x="175" y="62" width="3" height="3" fill="#fce4ec"/>
+    <rect x="190" y="48" width="3" height="3" fill="#fce4ec"/>
+    <rect x="210" y="58" width="3" height="3" fill="#fce4ec"/>
+  </g>
+  <!-- Steve-like Rex character (center) -->
+  <g transform="translate(340 75)">
+    <rect x="0" y="0" width="22" height="22" fill="#e0b48a"/>
+    <rect x="0" y="0" width="22" height="5" fill="#3d2f1c"/>
+    <rect x="0" y="0" width="3" height="22" fill="#3d2f1c"/>
+    <rect x="19" y="0" width="3" height="22" fill="#3d2f1c"/>
+    <rect x="5" y="9" width="3" height="3" fill="white"/>
+    <rect x="14" y="9" width="3" height="3" fill="white"/>
+    <rect x="6" y="10" width="1" height="2" fill="#1a1a1a"/>
+    <rect x="15" y="10" width="1" height="2" fill="#1a1a1a"/>
+    <rect x="8" y="17" width="6" height="1" fill="#3d2f1c"/>
+    <rect x="3" y="22" width="16" height="14" fill="#0288d1"/>
+    <rect x="3" y="22" width="16" height="2" fill="#01579b"/>
+    <rect x="0" y="22" width="3" height="12" fill="#e0b48a"/>
+    <rect x="19" y="22" width="3" height="12" fill="#e0b48a"/>
+    <rect x="4" y="36" width="6" height="6" fill="#37474f"/>
+    <rect x="12" y="36" width="6" height="6" fill="#37474f"/>
+  </g>
+  <!-- Sign on the right -->
+  <g transform="translate(490 60)">
+    <rect x="38" y="40" width="4" height="55" fill="#5a4528"/>
+    <rect x="0" y="0" width="80" height="45" fill="#a0744e"/>
+    <rect x="0" y="0" width="80" height="3" fill="#7c5e3a"/>
+    <rect x="0" y="42" width="80" height="3" fill="#7c5e3a"/>
+    <rect x="0" y="0" width="3" height="45" fill="#7c5e3a"/>
+    <rect x="77" y="0" width="3" height="45" fill="#7c5e3a"/>
+    <text x="40" y="20" font-size="12" fill="#fcfc54" text-anchor="middle">Rex의</text>
+    <text x="40" y="35" font-size="12" fill="#fcfc54" text-anchor="middle">동물원 🐾</text>
+  </g>
+  <!-- flower -->
+  <g transform="translate(280 108)">
+    <rect x="0" y="0" width="2" height="6" fill="#5d8e3a"/>
+    <rect x="-2" y="-2" width="2" height="2" fill="#ef5350"/>
+    <rect x="2" y="-2" width="2" height="2" fill="#ef5350"/>
+    <rect x="-2" y="0" width="2" height="2" fill="#ef5350"/>
+    <rect x="2" y="0" width="2" height="2" fill="#ef5350"/>
+    <rect x="0" y="-2" width="2" height="2" fill="#fcfc54"/>
+    <rect x="0" y="0" width="2" height="2" fill="#fcfc54"/>
+  </g>
+  <g transform="translate(440 108)">
+    <rect x="0" y="0" width="2" height="6" fill="#5d8e3a"/>
+    <rect x="-2" y="-2" width="2" height="2" fill="#ffeb3b"/>
+    <rect x="2" y="-2" width="2" height="2" fill="#ffeb3b"/>
+    <rect x="-2" y="0" width="2" height="2" fill="#ffeb3b"/>
+    <rect x="2" y="0" width="2" height="2" fill="#ffeb3b"/>
+    <rect x="0" y="-2" width="2" height="2" fill="#fb8c00"/>
+    <rect x="0" y="0" width="2" height="2" fill="#fb8c00"/>
+  </g>
+</svg>`;
+
 function renderMenu() {
   app.appendChild(header());
+
+  // Hero illustration
+  const heroWrap = document.createElement('div');
+  heroWrap.innerHTML = HERO_SVG;
+  app.appendChild(heroWrap.firstElementChild);
+
   app.appendChild(h('h1', { class: 'menu-title' }, '🐾 구구단 동물원'));
   app.appendChild(h('p', { class: 'menu-subtitle' }, '곱셈을 풀면 동물 친구가 모여요!'));
 
   const seenCount = Object.keys(state.stage0Seen).length;
   const stages = [
-    { icon: '🎵', name: `준비 · 구구단 노래 (${seenCount}/8)`, desc: '2단부터 9단까지 차례로 들어봐', view: 'stage0' },
-    { icon: '🍎', name: '1단계 · 묶음 보기', desc: '곱셈이 뭘까? 묶어서 세어봐', view: 'stage1' },
-    { icon: '🟠', name: '2단계 · 점 배열', desc: '가로 × 세로 점을 세어봐', view: 'stage2' },
-    { icon: '🏃', name: '3단계 · 묶어세기', desc: '단별 리듬 익히기 (3,6,9...)', view: 'tablePicker', stage: 'stage3' },
-    { icon: '📝', name: '4단계 · 순서대로', desc: '한 단씩 차근차근 ➜ 수호 동물!', view: 'tablePicker', stage: 'stage4' },
-    { icon: '🎲', name: '5단계 · 랜덤 도전', desc: '뒤죽박죽 섞여 나와요!', view: 'stage5' },
+    { iconSvg: MC_BLOCKS.noteBlock, name: `준비 · 구구단 노래 (${seenCount}/8)`, desc: '2단부터 9단까지 차례로 들어봐', view: 'stage0' },
+    { iconSvg: MC_BLOCKS.apple, name: '1단계 · 묶음 보기', desc: '곱셈이 뭘까? 묶어서 세어봐', view: 'stage1' },
+    { iconSvg: MC_BLOCKS.redstone, name: '2단계 · 점 배열', desc: '가로 × 세로 점을 세어봐', view: 'stage2' },
+    { iconSvg: MC_BLOCKS.slime, name: '3단계 · 묶어세기', desc: '단별 리듬 익히기 (3,6,9...)', view: 'tablePicker', stage: 'stage3' },
+    { iconSvg: MC_BLOCKS.book, name: '4단계 · 순서대로', desc: '한 단씩 차근차근 ➜ 수호 동물!', view: 'tablePicker', stage: 'stage4' },
+    { iconSvg: MC_BLOCKS.dice, name: '5단계 · 랜덤 도전', desc: '뒤죽박죽 섞여 나와요!', view: 'stage5' },
   ];
 
   const grid = h('div', { class: 'stage-grid' });
@@ -1007,7 +1316,7 @@ function renderMenu() {
       class: 'stage-card',
       onClick: () => { sndClick(); navigate(s.view, { stage: s.stage }); }
     },
-      h('div', { class: 'stage-icon' }, s.icon),
+      h('div', { class: 'stage-icon', html: s.iconSvg }),
       h('div', { class: 'stage-info' },
         h('div', { class: 'stage-name' }, s.name),
         h('div', { class: 'stage-desc' }, s.desc),
