@@ -1,0 +1,1582 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>은호의 구구단 동물원 🐾</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body {
+  height: 100%;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  background: linear-gradient(180deg, #b3e5fc 0%, #fff9c4 100%);
+  min-height: 100vh;
+  color: #2c3e50;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+#app {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 16px 16px 60px;
+  min-height: 100vh;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.75);
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+.header .title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.header .stars { font-size: 1.05rem; font-weight: 800; color: #f57c00; }
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 22px;
+  border: none;
+  border-radius: 16px;
+  background: #ffb74d;
+  color: white;
+  font-size: 1.05rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 #f57c00;
+  transition: transform 0.1s, box-shadow 0.1s;
+  font-family: inherit;
+}
+.btn:active { transform: translateY(2px); box-shadow: 0 2px 0 #f57c00; }
+.btn.primary { background: #4fc3f7; box-shadow: 0 4px 0 #0288d1; }
+.btn.primary:active { box-shadow: 0 2px 0 #0288d1; }
+.btn.success { background: #81c784; box-shadow: 0 4px 0 #388e3c; }
+.btn.success:active { box-shadow: 0 2px 0 #388e3c; }
+.btn.ghost {
+  background: white; color: #2c3e50;
+  box-shadow: 0 4px 0 #cfd8dc;
+}
+.btn.ghost:active { box-shadow: 0 2px 0 #cfd8dc; }
+.btn.big { font-size: 1.3rem; padding: 18px 28px; }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.menu-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: 900;
+  margin: 12px 0 4px;
+  color: #1565c0;
+}
+.menu-subtitle {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #5d6d7e;
+  margin-bottom: 20px;
+}
+
+.stage-grid { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.stage-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px;
+  background: white;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: transform 0.15s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.stage-card:active { transform: scale(0.97); }
+.stage-icon {
+  width: 60px; height: 60px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 2.2rem;
+  background: #fff3e0;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.stage-info { flex: 1; min-width: 0; }
+.stage-name { font-size: 1.05rem; font-weight: 800; }
+.stage-desc { font-size: 0.85rem; color: #78909c; margin-top: 2px; }
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+.groups-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  justify-content: center;
+  padding: 16px;
+  min-height: 180px;
+  align-items: center;
+}
+.group {
+  display: grid;
+  gap: 4px;
+  padding: 10px;
+  background: #fff3e0;
+  border-radius: 14px;
+  border: 3px solid #ffe0b2;
+}
+.group.counted {
+  background: #c8e6c9;
+  border-color: #81c784;
+  animation: pop 0.4s;
+}
+.item-emoji {
+  font-size: 1.8rem;
+  text-align: center;
+  line-height: 1;
+}
+.group-label {
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-align: center;
+  margin-top: 6px;
+  color: #ef6c00;
+}
+
+.array-wrap {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
+  perspective: 800px;
+}
+.array-container {
+  display: grid;
+  gap: 6px;
+  padding: 20px;
+  background: #e1f5fe;
+  border-radius: 20px;
+  transition: transform 0.7s cubic-bezier(.68,-0.4,.27,1.45);
+}
+.array-container.rotating { transform: rotateZ(90deg); }
+.dot {
+  width: 28px; height: 28px;
+  background: #ff7043;
+  border-radius: 50%;
+  box-shadow: inset -3px -3px 0 rgba(0,0,0,0.15);
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px;
+  background: #f5f5f5;
+  border-radius: 18px;
+  overflow-x: auto;
+  margin-bottom: 16px;
+}
+.track-step {
+  min-width: 50px;
+  height: 50px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%;
+  font-weight: 800;
+  font-size: 1.05rem;
+  background: white;
+  color: #b0bec5;
+  border: 3px solid #eceff1;
+  flex-shrink: 0;
+}
+.track-step.done { background: #c8e6c9; color: #2e7d32; border-color: #81c784; }
+.track-step.current {
+  background: #fff59d; color: #f57f17;
+  border-color: #fbc02d;
+  animation: pulse 1.2s infinite;
+  transform: scale(1.1);
+}
+@keyframes pulse {
+  0%, 100% { transform: scale(1.1); }
+  50% { transform: scale(1.2); }
+}
+@keyframes pop {
+  0% { transform: scale(0.5); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.question-box {
+  text-align: center;
+  padding: 20px 12px;
+}
+.question-text {
+  font-size: 2.8rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #2c3e50;
+  margin: 8px 0;
+}
+.choices {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 12px 0;
+}
+.choice-btn {
+  padding: 24px 8px;
+  font-size: 1.6rem;
+  font-weight: 900;
+  border: 3px solid #b3e5fc;
+  border-radius: 16px;
+  background: white;
+  color: #2c3e50;
+  cursor: pointer;
+  font-family: inherit;
+  transition: transform 0.1s;
+}
+.choice-btn:active { transform: scale(0.94); }
+.choice-btn.correct { background: #c8e6c9; border-color: #388e3c; }
+.choice-btn.wrong { background: #ffcdd2; border-color: #c62828; }
+.choice-btn:disabled { cursor: not-allowed; }
+
+.hint {
+  text-align: center;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.7);
+  border-radius: 14px;
+  font-size: 1rem;
+  margin: 10px 0;
+  font-weight: 600;
+  color: #455a64;
+}
+
+.collection-section { margin-bottom: 20px; }
+.section-title {
+  font-size: 1.05rem;
+  font-weight: 800;
+  margin-bottom: 10px;
+  color: #1565c0;
+}
+.collection-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+@media (max-width: 480px) {
+  .collection-grid { grid-template-columns: repeat(3, 1fr); }
+  .choices { grid-template-columns: repeat(3, 1fr); }
+}
+.animal-card {
+  background: white;
+  border-radius: 16px;
+  padding: 12px 6px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  position: relative;
+}
+.animal-card.locked { background: #f5f5f5; }
+.animal-card.tier-common { border: 2px solid #cfd8dc; }
+.animal-card.tier-rare { border: 2px solid #64b5f6; }
+.animal-card.tier-epic { border: 2px solid #ba68c8; }
+.animal-card.tier-legendary { border: 2px solid #ffb74d; background: linear-gradient(135deg, #fff9c4 0%, #ffe0b2 100%); }
+.animal-emoji { font-size: 2.4rem; line-height: 1; }
+.animal-emoji.locked { filter: grayscale(1); opacity: 0.25; }
+.animal-name { font-size: 0.8rem; font-weight: 700; margin-top: 4px; }
+.animal-tag { font-size: 0.7rem; color: #78909c; margin-top: 2px; }
+.tier-stars {
+  position: absolute; top: 4px; right: 6px;
+  font-size: 0.65rem; color: #ffa726;
+}
+
+.modal-bg {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.55);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 100;
+  padding: 20px;
+}
+.modal {
+  background: white;
+  border-radius: 24px;
+  padding: 28px 24px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+  animation: modalPop 0.4s cubic-bezier(.68,-0.55,.27,1.55);
+}
+@keyframes modalPop {
+  0% { transform: scale(0); }
+  100% { transform: scale(1); }
+}
+.modal h2 { font-size: 1.3rem; margin-bottom: 8px; }
+.modal p { font-size: 0.95rem; color: #607d8b; margin: 8px 0; }
+.modal .reward-emoji {
+  font-size: 5rem;
+  margin: 12px 0;
+  animation: bounce 0.9s infinite alternate;
+}
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to { transform: translateY(-10px); }
+}
+
+.feedback-popup {
+  position: fixed;
+  top: 30%; left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 5rem;
+  pointer-events: none;
+  z-index: 50;
+  animation: feedbackAnim 0.9s forwards;
+}
+@keyframes feedbackAnim {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -90%) scale(0.9); }
+}
+
+.table-picker {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin: 12px 0;
+}
+.table-btn {
+  padding: 18px 0;
+  font-size: 1.3rem;
+  font-weight: 900;
+  border: 3px solid #b3e5fc;
+  border-radius: 14px;
+  background: white;
+  cursor: pointer;
+  font-family: inherit;
+  position: relative;
+  color: #2c3e50;
+}
+.table-btn:active { transform: scale(0.95); }
+.table-btn.done { background: #e8f5e9; border-color: #66bb6a; }
+.table-btn.done::after {
+  content: '✓';
+  position: absolute; top: 4px; right: 8px;
+  color: #2e7d32; font-size: 1rem;
+}
+
+.gacha-area {
+  text-align: center;
+  padding: 20px;
+}
+.gacha-box {
+  font-size: 7rem;
+  margin: 16px 0;
+  display: inline-block;
+}
+.gacha-box.shaking { animation: shake 0.4s infinite; }
+@keyframes shake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  25% { transform: translateX(-6px) rotate(-5deg); }
+  75% { transform: translateX(6px) rotate(5deg); }
+}
+
+.row { display: flex; gap: 8px; align-items: center; }
+.center { text-align: center; }
+.mt-1 { margin-top: 8px; } .mt-2 { margin-top: 16px; } .mt-3 { margin-top: 24px; }
+.mb-1 { margin-bottom: 8px; } .mb-2 { margin-bottom: 16px; }
+.muted { color: #78909c; }
+.small { font-size: 0.9rem; }
+
+.progress-bar {
+  height: 10px;
+  background: #eceff1;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #81c784, #66bb6a);
+  transition: width 0.4s;
+}
+
+.back-btn {
+  background: rgba(255,255,255,0.8);
+  border: none;
+  border-radius: 14px;
+  padding: 10px 14px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  color: #455a64;
+  font-family: inherit;
+  margin-right: 10px;
+}
+
+.streak-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: #fff3e0;
+  border-radius: 12px;
+  font-weight: 800;
+  color: #e65100;
+  font-size: 0.95rem;
+}
+
+.formula-display {
+  font-size: 1.8rem;
+  font-weight: 900;
+  text-align: center;
+  padding: 16px;
+  color: #1565c0;
+  letter-spacing: 2px;
+}
+.formula-display .equals {
+  color: #ff7043;
+  margin: 0 8px;
+}
+
+.gugu-table-card {
+  background: white;
+  border-radius: 24px;
+  padding: 20px 16px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  margin-bottom: 16px;
+}
+.gugu-title {
+  text-align: center;
+  font-size: 2.4rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+}
+.gugu-subhint {
+  text-align: center;
+  font-size: 0.95rem;
+  color: #78909c;
+  margin-bottom: 16px;
+}
+.gugu-rows { display: flex; flex-direction: column; gap: 10px; }
+.gugu-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: #fafafa;
+  border-radius: 14px;
+  border-left: 6px solid var(--table-color, #b3e5fc);
+  opacity: 0;
+  transform: translateX(-20px);
+}
+.gugu-row.shown {
+  animation: rowSlideIn 0.5s forwards cubic-bezier(.68,-0.4,.27,1.4);
+}
+@keyframes rowSlideIn {
+  to { opacity: 1; transform: translateX(0); }
+}
+.gugu-groups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-start;
+}
+.gugu-group {
+  display: inline-flex;
+  gap: 4px;
+  padding: 6px 10px;
+  background: var(--table-color-light, rgba(0,0,0,0.04));
+  border-radius: 10px;
+  align-items: center;
+}
+.gugu-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--table-color, #607d8b);
+  box-shadow: inset -2px -2px 0 rgba(0,0,0,0.18);
+  opacity: 0;
+  transform: scale(0);
+  animation: dotPop 0.35s forwards cubic-bezier(.68,-0.55,.27,1.6);
+}
+@keyframes dotPop {
+  0% { opacity: 0; transform: scale(0); }
+  60% { opacity: 1; transform: scale(1.3); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.gugu-formula {
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 6px;
+  font-weight: 900;
+}
+.gugu-formula .lhs { font-size: 1.4rem; color: #455a64; }
+.gugu-formula .eq { color: #ff7043; font-size: 1.3rem; }
+.gugu-formula .rhs {
+  font-size: 1.9rem;
+  color: var(--table-color, #d84315);
+  margin-left: 4px;
+}
+.gugu-row-placeholder {
+  padding: 12px;
+  background: #f0f0f0;
+  border-radius: 14px;
+  text-align: center;
+  font-weight: 800;
+  color: #b0bec5;
+  border-left: 6px solid #eceff1;
+  font-size: 1.1rem;
+}
+
+.progress-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0 16px;
+  flex-wrap: wrap;
+}
+.progress-dot {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  background: #eceff1;
+  color: #90a4ae;
+  border: 2px solid transparent;
+}
+.progress-dot.done { background: #c8e6c9; color: #2e7d32; }
+.progress-dot.current {
+  background: #fff59d;
+  color: #f57f17;
+  border-color: #fbc02d;
+  transform: scale(1.15);
+}
+
+.stage0-nav {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin: 16px -16px 0;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(255,249,196,0) 0%, rgba(255,249,196,0.95) 30%);
+  backdrop-filter: blur(6px);
+  z-index: 10;
+  flex-wrap: wrap;
+}
+.stage0-nav .btn { flex: 1; min-width: 110px; }
+.stage0-nav .btn.big { padding: 16px 18px; font-size: 1.15rem; }
+/* extra bottom padding so last row isn't hidden behind sticky nav */
+.gugu-rows { padding-bottom: 8px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+// ============ CONSTANTS ============
+const GUARDIAN_ANIMALS = {
+  2: { emoji: '🐰', name: '토끼' },
+  3: { emoji: '🐱', name: '고양이' },
+  4: { emoji: '🐶', name: '강아지' },
+  5: { emoji: '🦊', name: '여우' },
+  6: { emoji: '🐼', name: '판다' },
+  7: { emoji: '🦁', name: '사자' },
+  8: { emoji: '🐘', name: '코끼리' },
+  9: { emoji: '🦄', name: '유니콘' },
+};
+
+const BONUS_ANIMALS = [
+  { emoji: '🐭', name: '생쥐', tier: 'common' },
+  { emoji: '🐹', name: '햄스터', tier: 'common' },
+  { emoji: '🐦', name: '참새', tier: 'common' },
+  { emoji: '🐠', name: '물고기', tier: 'common' },
+  { emoji: '🦔', name: '고슴도치', tier: 'common' },
+  { emoji: '🐔', name: '닭', tier: 'common' },
+  { emoji: '🐤', name: '병아리', tier: 'common' },
+  { emoji: '🐌', name: '달팽이', tier: 'common' },
+  { emoji: '🐛', name: '애벌레', tier: 'common' },
+  { emoji: '🦉', name: '부엉이', tier: 'rare' },
+  { emoji: '🐢', name: '거북이', tier: 'rare' },
+  { emoji: '🦜', name: '앵무새', tier: 'rare' },
+  { emoji: '🐿️', name: '다람쥐', tier: 'rare' },
+  { emoji: '🐧', name: '펭귄', tier: 'rare' },
+  { emoji: '🦆', name: '오리', tier: 'rare' },
+  { emoji: '🐝', name: '꿀벌', tier: 'rare' },
+  { emoji: '🦝', name: '너구리', tier: 'rare' },
+  { emoji: '🐉', name: '용', tier: 'epic' },
+  { emoji: '🦖', name: '티라노', tier: 'epic' },
+  { emoji: '🐳', name: '고래', tier: 'epic' },
+  { emoji: '🦋', name: '나비', tier: 'epic' },
+  { emoji: '🐊', name: '악어', tier: 'epic' },
+  { emoji: '🦚', name: '공작새', tier: 'legendary' },
+  { emoji: '🦩', name: '홍학', tier: 'legendary' },
+  { emoji: '🐲', name: '아기용', tier: 'legendary' },
+];
+
+const TIER_INFO = {
+  common: { stars: '★', weight: 60, label: '평범' },
+  rare: { stars: '★★', weight: 25, label: '귀한' },
+  epic: { stars: '★★★', weight: 12, label: '특별' },
+  legendary: { stars: '★★★★', weight: 3, label: '전설' },
+};
+
+const STAGE1_ITEMS = ['🍎', '🍓', '🍊', '🍇', '🍌', '🥕', '🌰', '🍪'];
+const TABLES = [2, 3, 4, 5, 6, 7, 8, 9];
+const GACHA_COST = 10;
+
+// ============ STATE ============
+const STORAGE_KEY = 'eunho-mult-game-v1';
+function defaultState() {
+  return {
+    stars: 0,
+    guardians: {},
+    bonusAnimals: {},
+    sessionProblems: {}, // for stage 5 weighting: { "3x4": { correct: 0, wrong: 0 } }
+    tablesDone: { s3: {}, s4: {} },
+    stage0Seen: {},
+    streak: 0,
+    bestStreak: 0,
+  };
+}
+let state = loadState();
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return defaultState();
+    return { ...defaultState(), ...JSON.parse(raw) };
+  } catch (e) { return defaultState(); }
+}
+function saveState() { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); }
+
+// ============ AUDIO ============
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch (e) { audioCtx = null; }
+  }
+  return audioCtx;
+}
+function tone(freq, duration = 0.15, type = 'sine', volume = 0.18) {
+  const ctx = getAudio(); if (!ctx) return;
+  try {
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(volume, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start();
+    osc.stop(ctx.currentTime + duration);
+  } catch (e) {}
+}
+function sndCorrect() { tone(660, 0.1); setTimeout(() => tone(880, 0.18), 90); }
+function sndWrong() { tone(220, 0.18, 'sawtooth', 0.12); }
+function sndReward() {
+  [523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => tone(f, 0.16), i * 90));
+}
+function sndClick() { tone(440, 0.05, 'sine', 0.1); }
+
+// ============ HELPERS ============
+function h(tag, props, ...children) {
+  const el = document.createElement(tag);
+  if (props) {
+    for (const [k, v] of Object.entries(props)) {
+      if (v == null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'style') el.setAttribute('style', v);
+      else if (k.startsWith('on') && typeof v === 'function') el.addEventListener(k.slice(2).toLowerCase(), v);
+      else if (k === 'html') el.innerHTML = v;
+      else el.setAttribute(k, v);
+    }
+  }
+  for (const c of children.flat(Infinity)) {
+    if (c == null || c === false) continue;
+    el.appendChild(typeof c === 'string' || typeof c === 'number'
+      ? document.createTextNode(c) : c);
+  }
+  return el;
+}
+function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
+function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+function shuffle(arr) { return arr.slice().sort(() => Math.random() - 0.5); }
+
+function generateChoices(correct) {
+  const set = new Set([correct]);
+  let tries = 0;
+  while (set.size < 3 && tries < 50) {
+    tries++;
+    const delta = (randInt(1, 5)) * (Math.random() < 0.5 ? 1 : -1);
+    const c = correct + delta;
+    if (c > 0 && c <= 99) set.add(c);
+  }
+  while (set.size < 3) set.add(randInt(1, 81));
+  return shuffle(Array.from(set));
+}
+
+function feedback(type) {
+  const el = h('div', { class: 'feedback-popup' }, type === 'correct' ? '🎉' : '🤔');
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 900);
+}
+
+function showModal({ emoji, title, body, button = '좋아!', onClose }) {
+  const bg = h('div', { class: 'modal-bg' });
+  const modal = h('div', { class: 'modal' },
+    emoji && h('div', { class: 'reward-emoji' }, emoji),
+    h('h2', null, title),
+    body && (typeof body === 'string' ? h('p', null, body) : body),
+    h('button', { class: 'btn primary mt-2', onClick: () => { bg.remove(); if (onClose) onClose(); } }, button),
+  );
+  bg.appendChild(modal);
+  document.body.appendChild(bg);
+}
+
+function awardStars(amount) {
+  state.stars += amount;
+  saveState();
+}
+
+function awardGuardian(table) {
+  if (state.guardians[table]) return false;
+  state.guardians[table] = true;
+  saveState();
+  return true;
+}
+
+function pickGachaAnimal() {
+  const totalWeight = Object.values(TIER_INFO).reduce((s, t) => s + t.weight, 0);
+  let r = Math.random() * totalWeight;
+  let tier = 'common';
+  for (const [t, info] of Object.entries(TIER_INFO)) {
+    if (r < info.weight) { tier = t; break; }
+    r -= info.weight;
+  }
+  const pool = BONUS_ANIMALS.filter(a => a.tier === tier);
+  return pick(pool);
+}
+
+// ============ ROUTER ============
+const app = document.getElementById('app');
+let view = 'menu';
+let params = {};
+function navigate(v, p = {}) {
+  view = v; params = p;
+  window.scrollTo(0, 0);
+  render();
+}
+
+function header() {
+  return h('div', { class: 'header' },
+    h('div', { class: 'title', onClick: () => navigate('menu') }, '🐾 은호의 동물원'),
+    h('div', { class: 'stars' }, `⭐ ${state.stars}`),
+  );
+}
+
+function backHeader(title) {
+  return h('div', { class: 'header' },
+    h('button', { class: 'back-btn', onClick: () => navigate('menu') }, '← 메뉴'),
+    h('div', { class: 'title', style: 'flex: 1; text-align: center; cursor: default;' }, title),
+    h('div', { class: 'stars' }, `⭐ ${state.stars}`),
+  );
+}
+
+function render() {
+  app.innerHTML = '';
+  switch (view) {
+    case 'menu': return renderMenu();
+    case 'stage0': return renderStage0();
+    case 'stage1': return renderStage1();
+    case 'stage2': return renderStage2();
+    case 'stage3': return renderStage3();
+    case 'stage4': return renderStage4();
+    case 'stage5': return renderStage5();
+    case 'collection': return renderCollection();
+    case 'gacha': return renderGacha();
+    case 'tablePicker': return renderTablePicker(params);
+  }
+}
+
+// ============ MENU ============
+function renderMenu() {
+  app.appendChild(header());
+  app.appendChild(h('h1', { class: 'menu-title' }, '🐾 구구단 동물원'));
+  app.appendChild(h('p', { class: 'menu-subtitle' }, '곱셈을 풀면 동물 친구가 모여요!'));
+
+  const seenCount = Object.keys(state.stage0Seen).length;
+  const stages = [
+    { icon: '🎵', name: `준비 · 구구단 노래 (${seenCount}/8)`, desc: '2단부터 9단까지 차례로 들어봐', view: 'stage0' },
+    { icon: '🍎', name: '1단계 · 묶음 보기', desc: '곱셈이 뭘까? 묶어서 세어봐', view: 'stage1' },
+    { icon: '🟠', name: '2단계 · 점 배열', desc: '가로 × 세로 점을 세어봐', view: 'stage2' },
+    { icon: '🏃', name: '3단계 · 묶어세기', desc: '단별 리듬 익히기 (3,6,9...)', view: 'tablePicker', stage: 'stage3' },
+    { icon: '📝', name: '4단계 · 순서대로', desc: '한 단씩 차근차근 ➜ 수호 동물!', view: 'tablePicker', stage: 'stage4' },
+    { icon: '🎲', name: '5단계 · 랜덤 도전', desc: '뒤죽박죽 섞여 나와요!', view: 'stage5' },
+  ];
+
+  const grid = h('div', { class: 'stage-grid' });
+  stages.forEach(s => {
+    grid.appendChild(h('div', {
+      class: 'stage-card',
+      onClick: () => { sndClick(); navigate(s.view, { stage: s.stage }); }
+    },
+      h('div', { class: 'stage-icon' }, s.icon),
+      h('div', { class: 'stage-info' },
+        h('div', { class: 'stage-name' }, s.name),
+        h('div', { class: 'stage-desc' }, s.desc),
+      ),
+    ));
+  });
+  app.appendChild(grid);
+
+  const guardianCount = Object.keys(state.guardians).length;
+  const bonusCount = Object.keys(state.bonusAnimals).length;
+
+  app.appendChild(h('div', { class: 'mt-3 row', style: 'gap: 10px; justify-content: center; flex-wrap: wrap;' },
+    h('button', { class: 'btn ghost', onClick: () => navigate('collection') },
+      `📖 도감 (${guardianCount + bonusCount})`),
+    h('button', { class: 'btn ghost', onClick: () => navigate('gacha') },
+      `🎁 뽑기`),
+  ));
+}
+
+// ============ STAGE 0: 구구단 노래 (단별 순회) ============
+const TABLE_COLORS = {
+  2: { main: '#ef5350', light: 'rgba(239,83,80,0.12)' },
+  3: { main: '#ff7043', light: 'rgba(255,112,67,0.12)' },
+  4: { main: '#ffb300', light: 'rgba(255,179,0,0.15)' },
+  5: { main: '#66bb6a', light: 'rgba(102,187,106,0.13)' },
+  6: { main: '#29b6f6', light: 'rgba(41,182,246,0.12)' },
+  7: { main: '#5c6bc0', light: 'rgba(92,107,192,0.12)' },
+  8: { main: '#ab47bc', light: 'rgba(171,71,188,0.12)' },
+  9: { main: '#ec407a', light: 'rgba(236,64,122,0.12)' },
+};
+const STAGE0_NOTES = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99];
+
+function renderStage0() {
+  const currentTable = params.table || 2;
+  const color = TABLE_COLORS[currentTable];
+  let revealedCount = 0;
+  let seenAwarded = false;
+
+  app.appendChild(backHeader(`준비 · ${currentTable}단`));
+
+  // progress dots
+  const dotsWrap = h('div', { class: 'progress-dots' });
+  TABLES.forEach(t => {
+    const cls = 'progress-dot' +
+      (t === currentTable ? ' current' : '') +
+      (state.stage0Seen[t] ? ' done' : '');
+    dotsWrap.appendChild(h('div', { class: cls }, `${t}`));
+  });
+  app.appendChild(dotsWrap);
+
+  const card = h('div', {
+    class: 'gugu-table-card',
+    style: `--table-color: ${color.main}; --table-color-light: ${color.light}; border-top: 6px solid ${color.main};`,
+  });
+  card.appendChild(h('div', { class: 'gugu-title', style: `color: ${color.main};` }, `${currentTable} 단`));
+  const hintEl = h('div', { class: 'gugu-subhint' }, `👇 아래 버튼을 톡 누르면 한 줄씩 나와요!`);
+  card.appendChild(hintEl);
+
+  // create 9 row containers (rendered as placeholders initially)
+  const rowsWrap = h('div', { class: 'gugu-rows' });
+  const slotEls = [];
+  for (let i = 1; i <= 9; i++) {
+    const placeholder = h('div', { class: 'gugu-row-placeholder' }, `${currentTable} × ${i} = ?`);
+    rowsWrap.appendChild(placeholder);
+    slotEls.push({ container: rowsWrap, placeholder, i });
+  }
+  card.appendChild(rowsWrap);
+  app.appendChild(card);
+
+  // bottom button: reveals next row, then becomes "next stage"
+  const mainBtn = h('button', { class: 'btn primary big' }, `👆 다음 줄 보기 (1 / 9)`);
+  const prevBtn = h('button', {
+    class: 'btn ghost',
+    onClick: () => { if (currentTable > 2) navigate('stage0', { table: currentTable - 1 }); },
+  }, '← 이전 단');
+  if (currentTable === 2) prevBtn.disabled = true;
+  const replayBtn = h('button', {
+    class: 'btn ghost',
+    onClick: () => navigate('stage0', { table: currentTable }),
+  }, '🔁 다시');
+
+  app.appendChild(h('div', { class: 'stage0-nav' }, prevBtn, replayBtn, mainBtn));
+
+  function revealNextRow() {
+    const i = revealedCount + 1;
+    const product = currentTable * i;
+    const slot = slotEls[revealedCount];
+
+    // build the actual row
+    const groupsContainer = h('div', { class: 'gugu-groups' });
+    for (let g = 0; g < i; g++) {
+      const group = h('div', { class: 'gugu-group' });
+      for (let k = 0; k < currentTable; k++) {
+        const dot = h('div', { class: 'gugu-dot' });
+        const totalIdx = g * currentTable + k;
+        const totalDots = i * currentTable;
+        const perDotDelay = Math.min(45, 600 / totalDots);
+        dot.style.animationDelay = `${totalIdx * perDotDelay + 200}ms`;
+        group.appendChild(dot);
+      }
+      groupsContainer.appendChild(group);
+    }
+    const formula = h('div', { class: 'gugu-formula' },
+      h('span', { class: 'lhs' }, `${currentTable} × ${i}`),
+      h('span', { class: 'eq' }, '='),
+      h('span', { class: 'rhs' }, String(product)),
+    );
+    const row = h('div', { class: 'gugu-row' }, groupsContainer, formula);
+    slot.placeholder.replaceWith(row);
+    requestAnimationFrame(() => {
+      row.classList.add('shown');
+      // keep the newly revealed row visible above the sticky button
+      setTimeout(() => row.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+    });
+
+    tone(STAGE0_NOTES[revealedCount], 0.22, 'sine', 0.13);
+    revealedCount++;
+
+    if (revealedCount < 9) {
+      mainBtn.textContent = `👆 다음 줄 보기 (${revealedCount + 1} / 9)`;
+    } else {
+      // all revealed — switch to next stage button
+      hintEl.textContent = '🎉 다 봤어! 다음 단으로 가볼까?';
+      mainBtn.textContent = currentTable < 9 ? `${currentTable + 1}단으로 →` : '🎉 끝!';
+      mainBtn.classList.remove('primary');
+      mainBtn.classList.add('success');
+      // re-bind to go-next
+      mainBtn.onclick = goNext;
+      // mark seen + reward
+      if (!seenAwarded && !state.stage0Seen[currentTable]) {
+        state.stage0Seen[currentTable] = true;
+        awardStars(1);
+        saveState();
+        seenAwarded = true;
+        const starsEl = app.querySelector('.stars');
+        if (starsEl) starsEl.textContent = `⭐ ${state.stars}`;
+        const dot = dotsWrap.children[currentTable - 2];
+        if (dot) dot.classList.add('done');
+      }
+    }
+  }
+
+  function goNext() {
+    if (currentTable < 9) navigate('stage0', { table: currentTable + 1 });
+    else finishStage0();
+  }
+
+  mainBtn.onclick = revealNextRow;
+}
+
+function finishStage0() {
+  sndReward();
+  showModal({
+    emoji: '🎵',
+    title: '구구단 노래 완성!',
+    body: h('div', null,
+      h('p', null, '2단부터 9단까지 모두 들어봤어요!'),
+      h('p', { class: 'muted' }, '이제 1단계로 가서 직접 풀어볼까?'),
+    ),
+    button: '메뉴로',
+    onClose: () => navigate('menu'),
+  });
+}
+
+// ============ STAGE 1: 묶음 보기 ============
+function renderStage1() {
+  const a = randInt(2, 5);
+  const b = randInt(2, 5);
+  const item = pick(STAGE1_ITEMS);
+  const correct = a * b;
+  const choices = generateChoices(correct);
+  let answered = false;
+  let countedGroups = 0;
+
+  app.appendChild(backHeader('1단계 · 묶음 보기'));
+  app.appendChild(h('div', { class: 'hint' },
+    `${item}이(가) ${a}개씩 ${b}묶음! 다 합치면 몇 개일까?`));
+
+  const groupsWrap = h('div', { class: 'card groups-container' });
+  const groups = [];
+  for (let i = 0; i < b; i++) {
+    const grp = h('div', { class: 'group' });
+    for (let j = 0; j < a; j++) {
+      grp.appendChild(h('div', { class: 'item-emoji' }, item));
+    }
+    const label = h('div', { class: 'group-label' }, '');
+    grp.appendChild(label);
+    grp.addEventListener('click', () => countGroup(i));
+    groups.push({ el: grp, label });
+    groupsWrap.appendChild(grp);
+  }
+  app.appendChild(groupsWrap);
+
+  app.appendChild(h('div', { class: 'small muted center', style: 'margin: -8px 0 12px;' },
+    '💡 묶음을 하나씩 톡톡 눌러서 같이 세어볼까?'));
+
+  function countGroup(i) {
+    if (groups[i].el.classList.contains('counted')) return;
+    groups[i].el.classList.add('counted');
+    countedGroups++;
+    const total = countedGroups * a;
+    groups[i].label.textContent = total;
+    tone(440 + countedGroups * 80, 0.12);
+  }
+
+  const choicesEl = h('div', { class: 'choices card' });
+  choices.forEach(c => {
+    const btn = h('button', { class: 'choice-btn' }, String(c));
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      answered = true;
+      if (c === correct) {
+        btn.classList.add('correct');
+        sndCorrect(); feedback('correct');
+        // auto-count remaining
+        for (let i = 0; i < b; i++) if (!groups[i].el.classList.contains('counted')) {
+          setTimeout(() => countGroup(i), (i + 1) * 100);
+        }
+        awardStars(1);
+        setTimeout(() => {
+          showModal({
+            emoji: '🎉',
+            title: '정답!',
+            body: h('div', { class: 'formula-display' },
+              `${a}`, h('span', { class: 'equals' }, '×'), `${b}`,
+              h('span', { class: 'equals' }, '='), `${correct}`,
+            ),
+            button: '다음 문제',
+            onClose: () => renderStage1AsView(),
+          });
+        }, 800);
+      } else {
+        btn.classList.add('wrong');
+        sndWrong(); feedback('wrong');
+        setTimeout(() => { btn.classList.remove('wrong'); answered = false; }, 600);
+      }
+    });
+    choicesEl.appendChild(btn);
+  });
+  app.appendChild(choicesEl);
+}
+function renderStage1AsView() { app.innerHTML = ''; renderStage1(); }
+
+// ============ STAGE 2: 점 배열 ============
+function renderStage2() {
+  const a = randInt(2, 9);
+  const b = randInt(2, 6);
+  const correct = a * b;
+  const choices = generateChoices(correct);
+  let answered = false;
+
+  app.appendChild(backHeader('2단계 · 점 배열'));
+  app.appendChild(h('div', { class: 'hint' },
+    `가로 ${a}개, 세로 ${b}줄이야. 점이 모두 몇 개?`));
+
+  const arr = h('div', {
+    class: 'array-container',
+    style: `grid-template-columns: repeat(${a}, 28px);`,
+  });
+  for (let i = 0; i < a * b; i++) arr.appendChild(h('div', { class: 'dot' }));
+  app.appendChild(h('div', { class: 'card array-wrap' }, arr));
+
+  const choicesEl = h('div', { class: 'choices card' });
+  choices.forEach(c => {
+    const btn = h('button', { class: 'choice-btn' }, String(c));
+    btn.addEventListener('click', () => {
+      if (answered) return;
+      answered = true;
+      if (c === correct) {
+        btn.classList.add('correct');
+        sndCorrect(); feedback('correct');
+        awardStars(1);
+        // rotation animation to teach commutative property
+        setTimeout(() => arr.classList.add('rotating'), 400);
+        setTimeout(() => {
+          showModal({
+            emoji: '🔄',
+            title: '돌려도 똑같아!',
+            body: h('div', null,
+              h('div', { class: 'formula-display' },
+                `${a}`, h('span', { class: 'equals' }, '×'), `${b}`,
+                h('span', { class: 'equals' }, '='), `${correct}`,
+              ),
+              h('div', { class: 'formula-display' },
+                `${b}`, h('span', { class: 'equals' }, '×'), `${a}`,
+                h('span', { class: 'equals' }, '='), `${correct}`,
+              ),
+              h('p', { class: 'muted' }, '가로 세로 바꿔도 답은 같아요!'),
+            ),
+            button: '다음 문제',
+            onClose: () => { app.innerHTML = ''; renderStage2(); },
+          });
+        }, 1200);
+      } else {
+        btn.classList.add('wrong');
+        sndWrong(); feedback('wrong');
+        setTimeout(() => { btn.classList.remove('wrong'); answered = false; }, 600);
+      }
+    });
+    choicesEl.appendChild(btn);
+  });
+  app.appendChild(choicesEl);
+}
+
+// ============ TABLE PICKER ============
+function renderTablePicker({ stage }) {
+  const titles = {
+    stage3: '3단계 · 단을 골라!',
+    stage4: '4단계 · 단을 골라!',
+  };
+  app.appendChild(backHeader(titles[stage] || '단 선택'));
+  app.appendChild(h('div', { class: 'hint' },
+    stage === 'stage3' ? '뛰어 세기로 익히고 싶은 단을 골라봐' : '수호 동물을 얻고 싶은 단을 골라봐'));
+
+  const picker = h('div', { class: 'table-picker card' });
+  TABLES.forEach(t => {
+    const isDone = state.tablesDone[stage] && state.tablesDone[stage][t];
+    const hasGuardian = state.guardians[t];
+    const btn = h('button', { class: 'table-btn' + (isDone ? ' done' : '') });
+    btn.appendChild(h('div', null, `${t}단`));
+    if (stage === 'stage4' && hasGuardian) {
+      btn.appendChild(h('div', { style: 'font-size: 1.4rem; margin-top: 4px;' }, GUARDIAN_ANIMALS[t].emoji));
+    }
+    btn.addEventListener('click', () => {
+      sndClick();
+      navigate(stage, { table: t });
+    });
+    picker.appendChild(btn);
+  });
+  app.appendChild(picker);
+}
+
+// ============ STAGE 3: 묶어세기 ============
+function renderStage3() {
+  const t = params.table || 2;
+  app.appendChild(backHeader(`3단계 · ${t}단 뛰어세기`));
+  app.appendChild(h('div', { class: 'hint' },
+    `${t}씩 뛰어 세어보자! 빈 칸에 들어갈 수는?`));
+
+  // visible numbers: positions 0..8 (representing ×1..×9). Some shown, some blank.
+  // Strategy: show some early ones, ask for the rest one by one
+  const sequence = [];
+  for (let i = 1; i <= 9; i++) sequence.push(t * i);
+
+  // We'll progressively reveal. State: currentIdx points to which one is being asked.
+  // First two are shown as hints; then ask 3rd, 4th... up to 9th.
+  let currentIdx = 2; // first unknown is index 2 (×3)
+  const filled = new Array(9).fill(false);
+  filled[0] = true; filled[1] = true;
+
+  const trackEl = h('div', { class: 'track' });
+  const stepEls = [];
+  for (let i = 0; i < 9; i++) {
+    const el = h('div', { class: 'track-step' });
+    el.textContent = filled[i] ? sequence[i] : '?';
+    if (filled[i]) el.classList.add('done');
+    trackEl.appendChild(el);
+    stepEls.push(el);
+  }
+  app.appendChild(trackEl);
+
+  const qbox = h('div', { class: 'card question-box' });
+  app.appendChild(qbox);
+  const choicesEl = h('div', { class: 'choices card' });
+  app.appendChild(choicesEl);
+
+  function updateUI() {
+    if (currentIdx >= 9) {
+      // done
+      qbox.innerHTML = '';
+      choicesEl.innerHTML = '';
+      qbox.appendChild(h('div', { class: 'question-text', style: 'font-size: 1.4rem; color: #388e3c;' }, '🎉 9칸 모두 완성!'));
+      finishStage3(t);
+      return;
+    }
+    stepEls.forEach((el, i) => {
+      el.classList.remove('current');
+      if (i === currentIdx) el.classList.add('current');
+    });
+
+    qbox.innerHTML = '';
+    qbox.appendChild(h('div', { class: 'question-text', style: 'font-size: 2rem;' },
+      `${t} × ${currentIdx + 1} = ?`));
+
+    const correct = sequence[currentIdx];
+    const opts = generateChoices(correct);
+    choicesEl.innerHTML = '';
+    let answered = false;
+    opts.forEach(c => {
+      const btn = h('button', { class: 'choice-btn' }, String(c));
+      btn.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        if (c === correct) {
+          btn.classList.add('correct');
+          sndCorrect(); feedback('correct');
+          stepEls[currentIdx].textContent = correct;
+          stepEls[currentIdx].classList.add('done');
+          stepEls[currentIdx].classList.remove('current');
+          currentIdx++;
+          setTimeout(updateUI, 700);
+        } else {
+          btn.classList.add('wrong');
+          sndWrong(); feedback('wrong');
+          setTimeout(() => { btn.classList.remove('wrong'); answered = false; }, 700);
+        }
+      });
+      choicesEl.appendChild(btn);
+    });
+  }
+  updateUI();
+}
+
+function finishStage3(t) {
+  const isFirst = !state.tablesDone.s3[t];
+  state.tablesDone.s3[t] = true;
+  const reward = isFirst ? 8 : 3;
+  awardStars(reward);
+  sndReward();
+  setTimeout(() => {
+    showModal({
+      emoji: '🏃‍♂️',
+      title: `${t}단 뛰어세기 완성!`,
+      body: h('div', null,
+        h('p', null, `별 ${reward}개를 받았어요!`),
+        h('p', { class: 'muted' }, isFirst ? '처음 완성이라 보너스!' : '계속 연습 좋아요!'),
+      ),
+      button: '돌아가기',
+      onClose: () => navigate('tablePicker', { stage: 'stage3' }),
+    });
+  }, 600);
+}
+
+// ============ STAGE 4: 순서대로 퀴즈 ============
+function renderStage4() {
+  const t = params.table || 2;
+  app.appendChild(backHeader(`4단계 · ${t}단 차근차근`));
+
+  let idx = 1;
+  let wrongs = 0;
+  const total = 9;
+
+  const progress = h('div', { class: 'progress-bar' },
+    h('div', { class: 'progress-fill', style: 'width: 0%;' }));
+  app.appendChild(progress);
+
+  const qbox = h('div', { class: 'card question-box' });
+  app.appendChild(qbox);
+  const choicesEl = h('div', { class: 'choices card' });
+  app.appendChild(choicesEl);
+
+  function updateUI() {
+    const fillPct = ((idx - 1) / total) * 100;
+    progress.querySelector('.progress-fill').style.width = fillPct + '%';
+
+    if (idx > total) {
+      finishStage4(t, wrongs);
+      return;
+    }
+    const correct = t * idx;
+    const opts = generateChoices(correct);
+    qbox.innerHTML = '';
+    qbox.appendChild(h('div', { class: 'small muted' }, `${idx} / ${total}`));
+    qbox.appendChild(h('div', { class: 'question-text' },
+      `${t} × ${idx} = ?`));
+
+    choicesEl.innerHTML = '';
+    let answered = false;
+    opts.forEach(c => {
+      const btn = h('button', { class: 'choice-btn' }, String(c));
+      btn.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        if (c === correct) {
+          btn.classList.add('correct');
+          sndCorrect(); feedback('correct');
+          awardStars(1);
+          idx++;
+          setTimeout(updateUI, 600);
+        } else {
+          btn.classList.add('wrong');
+          sndWrong(); feedback('wrong');
+          wrongs++;
+          setTimeout(() => { btn.classList.remove('wrong'); answered = false; }, 700);
+        }
+      });
+      choicesEl.appendChild(btn);
+    });
+  }
+  updateUI();
+}
+
+function finishStage4(t, wrongs) {
+  const wasFirst = !state.tablesDone.s4[t];
+  state.tablesDone.s4[t] = true;
+  const gotGuardian = awardGuardian(t);
+  const bonus = (wrongs === 0 ? 10 : 5);
+  awardStars(bonus);
+  sndReward();
+
+  setTimeout(() => {
+    if (gotGuardian) {
+      const g = GUARDIAN_ANIMALS[t];
+      showModal({
+        emoji: g.emoji,
+        title: `${t}단의 수호 동물!`,
+        body: h('div', null,
+          h('p', null, `${g.name}이(가) 도감에 추가됐어요!`),
+          h('p', { class: 'muted' }, `+ 별 ${bonus}개${wrongs === 0 ? ' (실수 없이 완성!)' : ''}`),
+        ),
+        button: '도감 보기',
+        onClose: () => navigate('collection'),
+      });
+    } else {
+      showModal({
+        emoji: '⭐',
+        title: `${t}단 완성!`,
+        body: `별 ${bonus}개${wrongs === 0 ? ' (실수 없음!)' : ''}`,
+        button: '돌아가기',
+        onClose: () => navigate('tablePicker', { stage: 'stage4' }),
+      });
+    }
+  }, 600);
+}
+
+// ============ STAGE 5: 랜덤 ============
+function renderStage5() {
+  app.appendChild(backHeader('5단계 · 랜덤 도전'));
+  app.appendChild(h('div', { class: 'hint' },
+    `🔥 연속 정답: ${state.streak} · 최고: ${state.bestStreak}`));
+
+  const qbox = h('div', { class: 'card question-box' });
+  app.appendChild(qbox);
+  const choicesEl = h('div', { class: 'choices card' });
+  app.appendChild(choicesEl);
+
+  app.appendChild(h('div', { class: 'row mt-2', style: 'justify-content: center;' },
+    h('button', { class: 'btn ghost', onClick: () => navigate('menu') }, '그만하기'),
+  ));
+
+  function pickProblem() {
+    // Leitner-ish: weight problems by (wrong*3 + max(0, 3-correct) + 1)
+    const candidates = [];
+    for (const a of TABLES) {
+      for (let b = 1; b <= 9; b++) {
+        const key = `${a}x${b}`;
+        const s = state.sessionProblems[key] || { correct: 0, wrong: 0 };
+        const weight = s.wrong * 3 + Math.max(0, 3 - s.correct) + 1;
+        candidates.push({ a, b, key, weight });
+      }
+    }
+    const total = candidates.reduce((s, c) => s + c.weight, 0);
+    let r = Math.random() * total;
+    for (const c of candidates) {
+      if (r < c.weight) return c;
+      r -= c.weight;
+    }
+    return candidates[0];
+  }
+
+  function nextQ() {
+    const { a, b, key } = pickProblem();
+    const correct = a * b;
+    const opts = generateChoices(correct);
+    qbox.innerHTML = '';
+    qbox.appendChild(h('div', { class: 'row', style: 'justify-content: center; margin-bottom: 8px;' },
+      h('div', { class: 'streak-badge' }, `🔥 ${state.streak}`)));
+    qbox.appendChild(h('div', { class: 'question-text' },
+      `${a} × ${b} = ?`));
+
+    choicesEl.innerHTML = '';
+    let answered = false;
+    opts.forEach(c => {
+      const btn = h('button', { class: 'choice-btn' }, String(c));
+      btn.addEventListener('click', () => {
+        if (answered) return;
+        answered = true;
+        if (!state.sessionProblems[key]) state.sessionProblems[key] = { correct: 0, wrong: 0 };
+        if (c === correct) {
+          btn.classList.add('correct');
+          sndCorrect(); feedback('correct');
+          state.sessionProblems[key].correct++;
+          state.streak++;
+          if (state.streak > state.bestStreak) state.bestStreak = state.streak;
+          let stars = 1;
+          if (state.streak > 0 && state.streak % 5 === 0) {
+            stars += 5;
+            setTimeout(() => sndReward(), 300);
+          }
+          awardStars(stars);
+          saveState();
+          // refresh streak display
+          const hint = app.querySelector('.hint');
+          if (hint) hint.textContent = `🔥 연속 정답: ${state.streak} · 최고: ${state.bestStreak}`;
+          // update stars in header
+          const starsEl = app.querySelector('.stars');
+          if (starsEl) starsEl.textContent = `⭐ ${state.stars}`;
+          if (state.streak > 0 && state.streak % 5 === 0) {
+            setTimeout(() => {
+              showModal({
+                emoji: '🔥',
+                title: `${state.streak}연속!`,
+                body: '+ 별 5개 보너스!',
+                button: '계속!',
+                onClose: nextQ,
+              });
+            }, 700);
+          } else {
+            setTimeout(nextQ, 700);
+          }
+        } else {
+          btn.classList.add('wrong');
+          sndWrong(); feedback('wrong');
+          state.sessionProblems[key].wrong++;
+          state.streak = 0;
+          saveState();
+          const hint = app.querySelector('.hint');
+          if (hint) hint.textContent = `🔥 연속 정답: ${state.streak} · 최고: ${state.bestStreak}`;
+          // show correct
+          Array.from(choicesEl.children).forEach(child => {
+            if (child.textContent === String(correct)) child.classList.add('correct');
+          });
+          setTimeout(() => {
+            showModal({
+              emoji: '💭',
+              title: `${a} × ${b} = ${correct}`,
+              body: '괜찮아! 다음에 또 만나면 풀 수 있어 💪',
+              button: '계속하기',
+              onClose: nextQ,
+            });
+          }, 800);
+        }
+      });
+      choicesEl.appendChild(btn);
+    });
+  }
+  nextQ();
+}
+
+// ============ COLLECTION ============
+function renderCollection() {
+  app.appendChild(backHeader('📖 동물 도감'));
+
+  const guardiansSec = h('div', { class: 'collection-section card' });
+  guardiansSec.appendChild(h('div', { class: 'section-title' },
+    `🛡️ 수호 동물 (${Object.keys(state.guardians).length} / 8)`));
+  const gGrid = h('div', { class: 'collection-grid' });
+  TABLES.forEach(t => {
+    const g = GUARDIAN_ANIMALS[t];
+    const got = state.guardians[t];
+    gGrid.appendChild(h('div', { class: 'animal-card' + (got ? '' : ' locked') },
+      h('div', { class: 'animal-emoji' + (got ? '' : ' locked') }, got ? g.emoji : '❓'),
+      h('div', { class: 'animal-name' }, got ? g.name : '???'),
+      h('div', { class: 'animal-tag' }, `${t}단`),
+    ));
+  });
+  guardiansSec.appendChild(gGrid);
+  app.appendChild(guardiansSec);
+
+  const bonusSec = h('div', { class: 'collection-section card' });
+  bonusSec.appendChild(h('div', { class: 'section-title' },
+    `🎁 친구 동물 (${Object.keys(state.bonusAnimals).length} / ${BONUS_ANIMALS.length})`));
+  const bGrid = h('div', { class: 'collection-grid' });
+  BONUS_ANIMALS.forEach(a => {
+    const got = state.bonusAnimals[a.emoji];
+    bGrid.appendChild(h('div', { class: `animal-card tier-${a.tier}` + (got ? '' : ' locked') },
+      h('div', { class: 'tier-stars' }, TIER_INFO[a.tier].stars),
+      h('div', { class: 'animal-emoji' + (got ? '' : ' locked') }, got ? a.emoji : '❓'),
+      h('div', { class: 'animal-name' }, got ? a.name : '???'),
+      h('div', { class: 'animal-tag' }, TIER_INFO[a.tier].label),
+    ));
+  });
+  bonusSec.appendChild(bGrid);
+  app.appendChild(bonusSec);
+}
+
+// ============ GACHA ============
+function renderGacha() {
+  app.appendChild(backHeader('🎁 동물 뽑기'));
+  const wrap = h('div', { class: 'card gacha-area' });
+
+  wrap.appendChild(h('div', { class: 'small muted' }, `별 ${GACHA_COST}개로 친구 동물을 뽑을 수 있어요!`));
+
+  const box = h('div', { class: 'gacha-box' }, '🎁');
+  wrap.appendChild(box);
+  wrap.appendChild(h('div', { class: 'small muted mb-2' },
+    `보유: ⭐ ${state.stars}`));
+
+  // probability hint
+  const probs = h('div', { class: 'small muted', style: 'margin: 10px 0; line-height: 1.6;' },
+    h('div', null, `★ 평범 60%  /  ★★ 귀한 25%`),
+    h('div', null, `★★★ 특별 12%  /  ★★★★ 전설 3%`),
+  );
+  wrap.appendChild(probs);
+
+  const canAfford = state.stars >= GACHA_COST;
+  const btn = h('button', {
+    class: 'btn big primary',
+    onClick: doGacha,
+  }, `🎁 뽑기 (⭐ ${GACHA_COST})`);
+  if (!canAfford) btn.disabled = true;
+  wrap.appendChild(btn);
+
+  app.appendChild(wrap);
+
+  function doGacha() {
+    if (state.stars < GACHA_COST) return;
+    state.stars -= GACHA_COST;
+    saveState();
+    btn.disabled = true;
+    box.classList.add('shaking');
+    sndClick();
+    setTimeout(() => {
+      const animal = pickGachaAnimal();
+      const wasNew = !state.bonusAnimals[animal.emoji];
+      state.bonusAnimals[animal.emoji] = true;
+      saveState();
+      box.classList.remove('shaking');
+      box.textContent = animal.emoji;
+      sndReward();
+      setTimeout(() => {
+        showModal({
+          emoji: animal.emoji,
+          title: `${animal.name}!`,
+          body: h('div', null,
+            h('div', { style: `font-weight: 800; color: ${
+              animal.tier === 'legendary' ? '#ef6c00' :
+              animal.tier === 'epic' ? '#8e24aa' :
+              animal.tier === 'rare' ? '#1976d2' : '#607d8b'
+            }; margin-bottom: 6px;` },
+              `${TIER_INFO[animal.tier].stars} ${TIER_INFO[animal.tier].label} 동물`),
+            h('p', { class: 'muted' }, wasNew ? '✨ 새 친구!' : '이미 만난 친구지만 반가워요!'),
+          ),
+          button: '한번 더!',
+          onClose: () => navigate('gacha'),
+        });
+      }, 500);
+    }, 1200);
+  }
+}
+
+// ============ INIT ============
+render();
+</script>
+</body>
+</html>
